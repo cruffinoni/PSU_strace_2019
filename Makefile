@@ -1,53 +1,43 @@
 ##
-## EPITECH PROJECT, 2020
-## OOP_strace_2019
+## EPITECH PROJECT, 2018
+## makefile
 ## File description:
-## Makefile for the project
+## This file is used for compilation of every files to make a binary file.
 ##
+MAIN_FILE		=	./src/main.c
+SRC				=
 
-MAIN_FILE		=	./src/Main.cpp
 NAME			=	strace
 
-SRC				=	\
-					./src/DLLoader/Exceptions.cpp
-
+SRC_TEST		=	./tests/test.c
 NAME_TEST		=	test_strace
 
-SRC_TEST		=	./Tests/Combinations.cpp	\
-					./Tests/Game.cpp			\
+INCLUDE_PATH	=	./include/
 
-INCLUDE			=	./src/
+CFLAGS			=	-Wall -Wextra -I $(INCLUDE_PATH)
 
-CXXFLAGS		=	-Wall -Wextra -I $(INCLUDE) -ldl
+OBJ				=	$(SRC:.c=.o)
+OBJ_MAIN		=	$(MAIN_FILE:.c=.o)
 
-ALL_SRC			=	$(SRC_GAME) $(SRC_GRAPHIC) $(SRC)
-OBJ				=	$(ALL_SRC:.cpp=.o)
-OBJ_MAIN		=	$(MAIN_FILE:.cpp=.o)
+$(NAME): $(OBJ) $(OBJ_MAIN)
+	gcc -o $(NAME) $(OBJ) $(OBJ_MAIN) $(CFLAGS)
 
 all: $(NAME)
 
-$(NAME): $(OBJ) $(OBJ_MAIN)
-	g++ -o $(NAME) $(OBJ) $(OBJ_MAIN) $(CXXFLAGS)
-
 debug:
-	g++ -o $(NAME) $(ALL_SRC) $(MAIN_FILE) $(CXXFLAGS)
+	gcc -o $(NAME) $(SRC) $(SRC_CMDS) $(MAIN_FILE) $(CFLAGS) -g
 
-tests_run:
-	g++ $(CXXFLAGS) -o $(NAME_TEST) $(SRC_TEST) $(ALL_SRC) -lcriterion --coverage
+tests_run: all
+	gcc $(CFLAGS) $(SRC_TEST) -o test_nm
+	#gcc -o $(NAME_TEST) $(SRC_TEST) $(SRC) $(CFLAGS) -lcriterion --coverage
 
 clean:
-	rm -f $(OBJ) $(OBJ_MAIN)
+	@rm -f $(OBJ) $(OBJ_MAIN) $(LIB_NAME)
 
 fclean:
-	rm -f $(OBJ) $(OBJ_MAIN)
-	rm -f $(NAME) $(NAME_TEST)
-
-lib:
-	$(MAKE) -C ./src/lib/graphic/
-
-lib_re:
-	$(MAKE) -C ./src/lib/graphic/ re
+	@rm -f $(OBJ) $(OBJ_MAIN) $(LIB_NAME)
+	@rm -f $(NAME) $(NAME_TEST)
 
 re:	fclean all
 
-.PHONY:	all clean fclean re debug tests_run lib lib_re
+.PHONY:	all clean fclean re debug

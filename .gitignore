@@ -103,6 +103,8 @@ a.out
 .vscode
 
 tmp_file
-test_nm
-my_nm
-my_objdump
+test_strace
+strace
+simple
+a
+b
