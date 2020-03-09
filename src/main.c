@@ -34,23 +34,24 @@ int main(int ac, char **av)
     } else {
         while (waitpid(child, &status, 0) && !WIFEXITED(status)) {
             struct user_regs_struct regs;
-            ptrace(PTRACE_GETREGS, child, NULL, &regs);
-            ptrace(PTRACE_SYSCALL, child, NULL, NULL);
-            if (regs.rax == (ullong_t) -38)
-                continue;
-            printf("[%llu] -> '%s' (%llx, 0x%llx, 0x%llx) = 0x%llx (= %lli)\n",
-            regs.orig_rax, SYSCALL_NAMES[regs.orig_rax], regs.rdi, regs.rsi, regs.rdx, regs.rax, regs.rax);
+            printf("Old rax: %llx\n", regs.rax);
+            ptrace(PTRACE_GETREGS, child, NULL, &regs); // PTRACE_SYSCALL
+            //if (regs.rax == (ullong_t) -38)
+            //    continue; // SYSCALL_NAMES[regs.orig_rax]
+            printf("[%llu] -> ? (%llx, 0x%llx, 0x%llx) = 0x%llx (= %lli)\n",
+            regs.orig_rax, regs.rdi, regs.rsi, regs.rdx, regs.rax, regs.rax);
             if (regs.orig_rax == 1) {
                 char *str = (char *) regs.rsi;
                 printf("write(%llu, ", regs.rdi);
-                for (ullong_t i = 0; i < regs.rax; i++) {
-                    if (str[i] < 97 || str[i] > 122)
-                        printf("%u", str[i]);
-                    else
-                        printf("%c", str[i]);
-                }
+                //for (ullong_t i = 0; i < regs.rax; i++) {
+                //    if (str[i] < 97 || str[i] > 122)
+                //        printf("%u", str[i]);
+                //    else
+                //        printf("%c", str[i]);
+                //}
                 printf("%llu) = %llu\n", regs.rdx, regs.rax);
             }
+            ptrace(PTRACE_SINGLESTEP, child, NULL, NULL);
         }
         printf("+++ exit with status %u +++\n", WEXITSTATUS(status));
     }
