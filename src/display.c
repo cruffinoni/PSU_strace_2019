@@ -13,17 +13,16 @@
 #include "strace.h"
 
 static void dislay_rtn_value(const struct user_regs_struct regs,
-    const pid_t child)
+    const strace_t *this)
 {
-    illong_t rtn = ptrace(PTRACE_PEEKTEXT, child, regs.rax, NULL);
+    illong_t rtn = ptrace(PTRACE_PEEKTEXT, this->child, regs.rax, NULL);
 
-    fprintf(stderr, " / param: %zu", strlen(SYSCALL_PARAMS[regs.orig_rax].params));
-    if ((illong_t) regs.rax < 0)
-        fprintf(stderr, " = %lli\n", rtn);
-    else if (regs.rax > 0xFFFF)
-        fprintf(stderr, " = 0x%llx\n", (ullong_t) regs.rax);
+    if ((illong_t) regs.rax < 0 && this->flags)
+        fprintf(stderr, ") = %lli\n", rtn);
+    else if (regs.rax > 0xFFFF || this->flags)
+        fprintf(stderr, ") = 0x%llx\n", (ullong_t) regs.rax);
     else
-        fprintf(stderr, " = %lli\n", regs.rax);
+        fprintf(stderr, ") = %lli\n", regs.rax);
 }
 
 static char *display_register(const ullong_t reg)
@@ -41,21 +40,18 @@ static char *display_register(const ullong_t reg)
 
 void display_trace(const strace_t *this, const regs_t regs)
 {
-    //printf(
-    //    "[%llu] -> '%s' (0x%llx, 0x%llx, 0x%llx) = 0x%llx (= %lli)\n",
-    //    regs.orig_rax, SYSCALL_NAMES[regs.orig_rax], regs.rdi,
-    //    regs.rsi, regs.rdx, regs.rax,
-    //    get_rtn_value(regs, this->child));
-    if (!this->flags)
-        fprintf(stderr,"%s(0x%llx, 0x%llx, 0x%llx) = 0x%llx\n",
-        SYSCALL_NAMES[regs.orig_rax], regs.rdi, regs.rsi, regs.rdx,
-        regs.rax);
-    else {
-        fprintf(stderr, "%s(", SYSCALL_NAMES[regs.orig_rax]);
-        for (uint i = 0, len = strlen(SYSCALL_PARAMS[regs.orig_rax].params); i < len; ++i) {
-            if (i == 0)
-                fprintf(stderr, ", ")
-        }
-        dislay_rtn_value(regs, this->child);
+    ullong_t registers[] = {regs.rdi, regs.rsi, regs.rdx, regs.rdx,
+                            regs.rdx, regs.rdx};
+    const size_t params_len = strlen(SYSCALL_PARAMS[regs.orig_rax].params);
+
+    fprintf(stderr, "%s(", SYSCALL_NAMES[regs.orig_rax]);
+    for (uint i = 0; i < params_len; ++i) {
+        if (!this->flags && SYSCALL_PARAMS[regs.orig_rax].params[i] != 'v')
+            fprintf(stderr, "0x%llx", registers[i]);
+        else if (this->flags)
+            fprintf(stderr, "?");
+        if ((i + 1) != params_len)
+            fprintf(stderr, ", ");
     }
+    dislay_rtn_value(regs, this);
 }
