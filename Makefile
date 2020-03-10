@@ -8,6 +8,9 @@ MAIN_FILE		=	./src/main.c
 SRC				=	./src/utils.c	\
 					./src/trace.c	\
 					./src/display.c	\
+					./src/params/string.c	\
+					./src/params/pointer.c	\
+					./src/params/integer.c	\
 
 NAME			=	strace
 

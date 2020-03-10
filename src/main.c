@@ -50,6 +50,7 @@ static error_t get_flags(strace_t *this, const char **av)
 {
     error_t err = ERR_NONE;
 
+    this->flags = 0;
     for (uint i = 1; av[i] != NULL; ++i) {
         if (IS_FLAG(av, i, 's'))
             this->flags = 1;

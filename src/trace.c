@@ -26,7 +26,7 @@ static error_t trace_child(strace_t *this)
         ptrace(PTRACE_SINGLESTEP, this->child, NULL, NULL);
     }
     this->child_exit = WEXITSTATUS(status);
-    fprintf(stderr, "exit_group(%u)\n", this->child_exit);
+    fprintf(stderr, "exit_group(%u) = ?\n", this->child_exit);
     fprintf(stderr, "+++ exited with %u +++\n", this->child_exit);
     ptrace(PTRACE_DETACH, this->child, NULL, NULL);
     return (ERR_NONE);

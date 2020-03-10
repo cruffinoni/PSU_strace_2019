@@ -37,5 +37,6 @@ error_t create_argv(const char *process_name, char ***argv)
     (*argv)[0] = strdup(process_name);
     if ((*argv)[0] == NULL)
         return (ERR_MALLOC);
+    (*argv)[1] = NULL;
     return (ERR_NONE);
 }

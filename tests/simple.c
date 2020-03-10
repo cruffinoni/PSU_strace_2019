@@ -15,7 +15,7 @@ int main(int ac, char **av)
     printf("my pid: %u\n", getpid());
     while (a++ < 3) {
         write(1, "hello world\n", 12);
-        sleep(10);
+        //sleep(10);
     }
     //_exit(32);
     return (0);

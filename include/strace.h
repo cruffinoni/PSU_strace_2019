@@ -34,4 +34,8 @@ error_t execute_child(strace_t *this);
 error_t create_argv(const char *process_name, char ***argv);
 void display_trace(const strace_t *this, const regs_t regs);
 
+char *display_string(const strace_t *this, const ullong_t reg);
+char *display_pointer(const ullong_t reg);
+char *display_integer(const ullong_t reg);
+
 #endif
