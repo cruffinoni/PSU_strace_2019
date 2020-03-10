@@ -10,5 +10,6 @@
 int main(int ac, char **av)
 {
     write(1, "hello world\n", 12);
+    //_exit(32);
     return (0);
 }
