@@ -5,7 +5,8 @@
 ## This file is used for compilation of every files to make a binary file.
 ##
 MAIN_FILE		=	./src/main.c
-SRC				=
+SRC				=	./src/utils.c	\
+					./src/trace.c	\
 
 NAME			=	strace
 

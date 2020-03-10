@@ -8,7 +8,7 @@
 #ifndef SRC_SYSCALL_NAMES_
 #define SRC_SYSCALL_NAMES_
 
-const char *SYSCALL_NAMES[] = {
+static const __attribute__ ((unused)) char *SYSCALL_NAMES[] = {
     "read", "write", "open", "close", "stat", "fstat", "lstat", "poll", "lseek",
     "mmap", "mprotect", "munmap", "brk", "rt_sigaction", "rt_sigprocmask",
     "rt_sigreturn", "ioctl", "pread64", "pwrite64", "readv", "writev",
