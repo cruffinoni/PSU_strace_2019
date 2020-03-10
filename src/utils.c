@@ -6,6 +6,8 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "error.h"
 
 static const char *ERR_NAMES[] = {
@@ -27,4 +29,13 @@ error_t display_err(const error_t error)
     return (ERR_EXIT);
 }
 
-
+error_t create_argv(const char *process_name, char ***argv)
+{
+    *argv = malloc(sizeof(char *) * 2);
+    if (*argv == NULL)
+        return (ERR_MALLOC);
+    (*argv)[0] = strdup(process_name);
+    if ((*argv)[0] == NULL)
+        return (ERR_MALLOC);
+    return (ERR_NONE);
+}

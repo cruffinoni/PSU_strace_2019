@@ -8,33 +8,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/ptrace.h>
 #include <unistd.h>
 #include <wait.h>
 #include <sys/user.h>
 #include "strace.h"
-
-static error_t create_argv(const char *process_name, char ***argv)
-{
-    *argv = malloc(sizeof(char *) * 2);
-    if (*argv == NULL)
-        return (ERR_MALLOC);
-    (*argv)[0] = strdup(process_name);
-    if ((*argv)[0] == NULL)
-        return (ERR_MALLOC);
-    return (ERR_NONE);
-}
-
-static illong_t get_rtn_value(const struct user_regs_struct regs,
-    const pid_t child)
-{
-    illong_t rtn = ptrace(PTRACE_PEEKTEXT, child, regs.rax, NULL);
-
-    if ((illong_t) regs.rax < 0)
-        return (rtn);
-    return ((ullong_t) regs.rax);
-}
 
 static error_t trace_child(strace_t *this)
 {
@@ -43,16 +21,8 @@ static error_t trace_child(strace_t *this)
 
     while (waitpid(this->child, &status, 0) && !WIFEXITED(status)) {
         ptrace(PTRACE_GETREGS, this->child, NULL, &regs);
-        if (IS_SYSCALL(regs.orig_rax)) {
-            //printf(
-            //    "[%llu] -> '%s' (0x%llx, 0x%llx, 0x%llx) = 0x%llx (= %lli)\n",
-            //    regs.orig_rax, SYSCALL_NAMES[regs.orig_rax], regs.rdi,
-            //    regs.rsi, regs.rdx, regs.rax,
-            //    get_rtn_value(regs, this->child));
-            fprintf(stderr,"%s(0x%llx, 0x%llx, 0x%llx) = 0x%llx\n",
-                SYSCALL_NAMES[regs.orig_rax], regs.rdi, regs.rsi, regs.rdx,
-                regs.rax);
-        }
+        if (IS_SYSCALL(regs.orig_rax))
+            display_trace(regs);
         ptrace(PTRACE_SINGLESTEP, this->child, NULL, NULL);
     }
     this->child_exit = WEXITSTATUS(status);
