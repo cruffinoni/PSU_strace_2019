@@ -5,46 +5,41 @@
 ** TODO: CHANGE DESCRIPTION.
 */
 
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ptrace.h>
 #include "strace.h"
 
-static char *retrieve_string(const ullong_t src, const pid_t child)
-{
-    char *str = NULL;
-    char c = 0;
-
-    for (int i = 0; str == NULL || c != '\0'; i++) {
-        str = realloc(str, i + 1);
-        if (str == NULL)
-            return (NULL);
-        c = (char) ptrace(PTRACE_PEEKTEXT, child, src + i, NULL);
-        if (IS_PRINTABLE(c))
-            str[i] = c;
-        else {
-            str = realloc(str, i + 1);
-            if (str == NULL)
-                return (NULL);
-            str[i++] = '\\';
-            str[i++] = 'n';
-        }
-    }
-    return (str);
-}
-
-static illong_t get_rtn_value(const struct user_regs_struct regs,
+static void dislay_rtn_value(const struct user_regs_struct regs,
     const pid_t child)
 {
     illong_t rtn = ptrace(PTRACE_PEEKTEXT, child, regs.rax, NULL);
 
+    fprintf(stderr, " / param: %zu", strlen(SYSCALL_PARAMS[regs.orig_rax].params));
     if ((illong_t) regs.rax < 0)
-        return (rtn);
-    return ((ullong_t) regs.rax);
+        fprintf(stderr, " = %lli\n", rtn);
+    else if (regs.rax > 0xFFFF)
+        fprintf(stderr, " = 0x%llx\n", (ullong_t) regs.rax);
+    else
+        fprintf(stderr, " = %lli\n", regs.rax);
 }
 
-void display_trace(strace_t *this, const regs_t regs)
+static char *display_register(const ullong_t reg)
+{
+    char *str = malloc(25);
+
+    if (str == NULL)
+        return (NULL);
+    if (reg < 0xFFFF)
+        sprintf(str, "%llu", reg);
+    else
+        sprintf(str, "0x%llx", reg);
+    return (str);
+}
+
+void display_trace(const strace_t *this, const regs_t regs)
 {
     //printf(
     //    "[%llu] -> '%s' (0x%llx, 0x%llx, 0x%llx) = 0x%llx (= %lli)\n",
@@ -56,8 +51,11 @@ void display_trace(strace_t *this, const regs_t regs)
         SYSCALL_NAMES[regs.orig_rax], regs.rdi, regs.rsi, regs.rdx,
         regs.rax);
     else {
-        fprintf(stderr,"%s(0x%llx, 0x%llx, 0x%llx) = 0x%llx\n",
-        SYSCALL_NAMES[regs.orig_rax], regs.rdi, regs.rsi, regs.rdx,
-        regs.rax);
+        fprintf(stderr, "%s(", SYSCALL_NAMES[regs.orig_rax]);
+        for (uint i = 0, len = strlen(SYSCALL_PARAMS[regs.orig_rax].params); i < len; ++i) {
+            if (i == 0)
+                fprintf(stderr, ", ")
+        }
+        dislay_rtn_value(regs, this->child);
     }
 }

@@ -7,6 +7,7 @@
 MAIN_FILE		=	./src/main.c
 SRC				=	./src/utils.c	\
 					./src/trace.c	\
+					./src/display.c	\
 
 NAME			=	strace
 

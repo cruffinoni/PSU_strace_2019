@@ -32,6 +32,6 @@ typedef struct strace_s {
 error_t display_err(const error_t error);
 error_t execute_child(strace_t *this);
 error_t create_argv(const char *process_name, char ***argv);
-void display_trace(strace_t *this, const regs_t regs);
+void display_trace(const strace_t *this, const regs_t regs);
 
 #endif

@@ -22,29 +22,21 @@ static error_t trace_child(strace_t *this)
     while (waitpid(this->child, &status, 0) && !WIFEXITED(status)) {
         ptrace(PTRACE_GETREGS, this->child, NULL, &regs);
         if (IS_SYSCALL(regs.orig_rax))
-            display_trace(regs);
+            display_trace(this, regs);
         ptrace(PTRACE_SINGLESTEP, this->child, NULL, NULL);
     }
     this->child_exit = WEXITSTATUS(status);
-    printf("exit_group(%u)\n", this->child_exit);
-    printf("+++ exited with %u +++\n", this->child_exit);
+    fprintf(stderr, "exit_group(%u)\n", this->child_exit);
+    fprintf(stderr, "+++ exited with %u +++\n", this->child_exit);
     ptrace(PTRACE_DETACH, this->child, NULL, NULL);
     return (ERR_NONE);
 }
 
-error_t execute_child(strace_t *this)
+static error_t create_child(strace_t *this)
 {
     char **av;
     error_t err;
 
-    if (this->child != 0) {
-        if (ptrace(PTRACE_ATTACH, this->child, NULL, NULL) == -1) {
-            perror("ptrace");
-            return (ERR_PTRACE);
-        }
-        printf("attached to: %u\n", this->child);
-        return (trace_child(this));
-    }
     this->child = fork();
     if (this->child == -1)
         return (ERR_CHILD);
@@ -57,4 +49,16 @@ error_t execute_child(strace_t *this)
         return (ERR_NONE);
     } else
         return (trace_child(this));
+}
+
+error_t execute_child(strace_t *this)
+{
+    if (this->child != 0) {
+        if (ptrace(PTRACE_ATTACH, this->child, NULL, NULL) == -1) {
+            perror("ptrace");
+            return (ERR_PTRACE);
+        }
+        return (trace_child(this));
+    }
+    return (create_child(this));
 }
