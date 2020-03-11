@@ -21,9 +21,7 @@ static const char *ERR_NAMES[] = {
 
 error_t display_err(const error_t error)
 {
-    if (error > ERR_MAX_ERR)
-        return (ERR_EXIT);
-    if (error == ERR_PTRACE)
+    if (error > ERR_MAX_ERR || error == ERR_PTRACE)
         return (ERR_EXIT);
     fprintf(stderr, "strace: %s\n", ERR_NAMES[error]);
     return (ERR_EXIT);

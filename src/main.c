@@ -5,7 +5,6 @@
 ** TODO: CHANGE DESCRIPTION.
 */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "strace.h"
@@ -36,13 +35,6 @@ static error_t get_pid(strace_t *this, const char *arg)
 static error_t create_child(strace_t *this, const char *process_name)
 {
     this->process_name = strdup(process_name);
-    //this->child = fork();
-    //if (this->child == -1)
-    //    return (ERR_CHILD);
-    //if (this->child == 0) {
-    //    ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-    //    execv("./simple", av);
-    //}
     return (this->process_name == NULL ? ERR_MALLOC : ERR_NONE);
 }
 
@@ -82,10 +74,10 @@ int main(const int ac, const char **av)
         free_strace(this);
         return (display_err(err));
     }
-    printf("Flags: %u / Process: '%s' & child id: %u\n", this->flags, this->process_name, this->child);
     if ((err = execute_child(this)) != ERR_NONE) {
         free_strace(this);
         return (display_err(err));
     }
-    return (this->child_exit);
+    free_strace(this);
+    return (ERR_NONE);
 }

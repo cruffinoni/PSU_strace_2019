@@ -44,7 +44,10 @@ static error_t create_child(strace_t *this)
         err = create_argv(this->process_name, &av);
         if (err != ERR_NONE)
             return (err);
-        ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+        if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) == -1) {
+            perror("ptrace");
+            return (ERR_PTRACE);
+        }
         execv(this->process_name, av);
         return (ERR_NONE);
     } else
