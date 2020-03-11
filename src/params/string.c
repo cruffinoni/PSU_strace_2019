@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include "strace.h"
 
-// hello\n world
-// hello world\n
-
 static size_t get_src_len(const ullong_t src, const pid_t child)
 {
     size_t size = 0;
@@ -31,9 +28,9 @@ static char *retrieve_string(const ullong_t src, const pid_t child)
     char *str = malloc(sizeof(char) * (len + 1));
     char c;
 
-    memset(str, '\0', len);
     if (str == NULL)
         return (NULL);
+    memset(str, '\0', len);
     for (uint i = 0, k = 0; i < len; i++, k++) {
         c = (char) ptrace(PTRACE_PEEKTEXT, child, src + i, NULL);
         if (IS_PRINTABLE(c))

@@ -23,7 +23,7 @@ typedef struct user_regs_struct regs_t;
 #define IS_FLAG(a, i, c) (a[i][0] == '-' && a[i][1] == c && a[i][2] == '\0')
 
 typedef struct strace_s {
-    uint flags;
+    uint verbose;
     pid_t child;
     char *process_name;
     uint child_exit;
