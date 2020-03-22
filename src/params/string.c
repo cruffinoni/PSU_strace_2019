@@ -37,8 +37,6 @@ static char *retrieve_string(const ullong_t src, const pid_t child)
             str[k] = c;
         else if (c != 0) {
             str = realloc(str, ++len);
-            if (str == NULL)
-                return (NULL);
             str[len - 1] = '\0';
             str[k++] = '\\';
             str[k] = 'n';
